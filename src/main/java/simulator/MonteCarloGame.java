@@ -144,8 +144,9 @@ public class MonteCarloGame {
 		{
 			ScoreBoard scoreBoard = simulateGame();
 			int combRuns = scoreBoard.getRunsAway() 
-					     + scoreBoard.getRunsHome();
-			combScore.addValue((double)combRuns + bias);
+					     + scoreBoard.getRunsHome()
+					     + (int)Math.round(bias);
+			combScore.addValue((double)combRuns);
 			combHisto.set(combRuns, combHisto.get(combRuns)+1);
 			if(scoreBoard.getRunsHome() > scoreBoard.getRunsAway())
 			{
@@ -275,19 +276,42 @@ public class MonteCarloGame {
 
 	// simulates the type of hit 
 	private Situation onBaseOutcome(BattingStats battingStats, PitchingStats pitchingStats, Situation situation) {
-		double probSingle = (double)battingStats.getSingles() / 
+		double currentWeight = 1.0;
+		double defaultWeight = 0.0;
+		
+		// If below threshold get weight
+		if(battingStats.getAtBats() < BattingStats.minTPA)
+		{
+			currentWeight = battingStats.getAtBats() / BattingStats.minTPA;
+			defaultWeight = (BattingStats.minTPA - battingStats.getAtBats()) 
+									/ BattingStats.minTPA;
+		}
+		
+		double probSingleCurrent = (double)battingStats.getSingles() / 
 				(double)(battingStats.getTpa() * battingStats.getOnBase());
-		double probDouble = (double)battingStats.getDoubles() / 
+		double probDoubleCurrent = (double)battingStats.getDoubles() / 
 				(double)(battingStats.getTpa() * battingStats.getOnBase());
-		double probTriple = (double)battingStats.getTriples() / 
+		double probTripleCurrent = (double)battingStats.getTriples() / 
 				(double)(battingStats.getTpa() * battingStats.getOnBase());
-		double probHR = (double)battingStats.getHr() / 
+		double probHRCurrent = (double)battingStats.getHr() / 
 				(double)(battingStats.getTpa() * battingStats.getOnBase());
-		double probWalk = (double)battingStats.getBb() / 
+		double probWalkCurrent = (double)battingStats.getBb() / 
 				(double)(battingStats.getTpa() * battingStats.getOnBase());
-		double probHitByPitch = (double)battingStats.getHitByPitch() / 
+		double probHitByPitchCurrent = (double)battingStats.getHitByPitch() / 
 				(double)(battingStats.getTpa() * battingStats.getOnBase());
 		
+		double probSingle = probSingleCurrent * currentWeight 
+				+ BattingStats.probSingleAve * defaultWeight;
+		double probDouble = probDoubleCurrent * currentWeight 
+				+ BattingStats.probDoubleAve * defaultWeight;
+		double probTriple = probTripleCurrent * currentWeight 
+				+ BattingStats.probTripleAve * defaultWeight;
+		double probHR = probHRCurrent * currentWeight 
+				+ BattingStats.probHRAve * defaultWeight;
+		double probWalk = probWalkCurrent * currentWeight 
+				+ BattingStats.probBBAve * defaultWeight;
+		double probHitByPitch = probHitByPitchCurrent * currentWeight 
+				+ BattingStats.probHitByPitchAve * defaultWeight;
 		double uniformDraw = random.nextDouble();
 		
 		// single
@@ -457,13 +481,34 @@ public class MonteCarloGame {
 		return situation;
 	}
 
-	// calculates the onbase probability taking in account 
-	private Double getOnBaseProb(BattingStats battingStats, PitchingStats pitchingStats) {
-		
-		double pitchingBias = pitchingStats.getOnBase() - PitchingStats.onBaseAve;
-		
-		return battingStats.getOnBase() + pitchingBias;
-	}
+	// calculates the onbase probability taking in account pitching stats
+		private Double getOnBaseProb(BattingStats battingStats, PitchingStats pitchingStats) {
+			
+			double battingOnBase = battingStats.getOnBase();
+			
+			// if tpa is less the minTpa then get weighed onbase percent
+			if(battingStats.getAtBats() < BattingStats.minTPA)
+			{
+				double currentWeight = battingStats.getAtBats() / BattingStats.minTPA;
+				double defaultWeight = (BattingStats.minTPA - battingStats.getAtBats()) 
+										/ BattingStats.minTPA;
+				battingOnBase = battingStats.getOnBase() * currentWeight 
+						+ BattingStats.onBaseAve * defaultWeight;
+			}
+			
+			double pitchingOnBase = pitchingStats.getOnBase();
+			if(pitchingStats.getInningsPitched() < PitchingStats.minInningsPitched)
+			{
+				double currentWeight = pitchingStats.getInningsPitched() / PitchingStats.minInningsPitched;
+				double defaultWeight = (PitchingStats.minInningsPitched - pitchingStats.getInningsPitched()) 
+										/ PitchingStats.minInningsPitched;
+				pitchingOnBase = pitchingStats.getOnBase() * currentWeight 
+						+ PitchingStats.onBaseAve * defaultWeight;
+			}
+			double pitchingBias = pitchingOnBase - PitchingStats.onBaseAve;
+			
+			return battingOnBase + pitchingBias;
+		}
 	
 	// calculates 
 	

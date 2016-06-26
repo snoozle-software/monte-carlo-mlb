@@ -24,8 +24,8 @@ import storage.PitchingStats;
 
 public class Main {
 	
-	private static final String baseURL = "http://localhost:5000/api";
-	///api?league=mlb&statType=montecarlostats&gameid=350405116"; 
+	private static final String baseURL = "http://sports.snoozle.net/api";
+	//private static final String baseURL = "http://localhost:5000/api";
 	
 	private final static String USER_AGENT = "Snoozle";
 	private final static int numOfMCGames = 1000;
@@ -52,9 +52,6 @@ public class Main {
 		String urlGameParameters = "league=mlb&statType=montecarlostats&gameid="+gameID;
 
 		String mcStatsJson = getJsonAPI(baseURL,urlGameParameters);
-		
-		//print result
-		System.out.println(mcStatsJson);
 		
 		JsonElement jelement = new JsonParser().parse(mcStatsJson);
 		JsonObject  jsonObj = jelement.getAsJsonObject();
@@ -85,7 +82,7 @@ public class Main {
 			System.out.println(String.format("Prob Home Team Wins: %.2f%%", mcGame.getHomeWinProb()*100));
 			System.out.println(String.format("Average Comb Score: %.2f",mcGame.getAveCombScore()));
 			System.out.println(String.format("Median Comb Score: %.2f",mcGame.getMedCombScore()));
-			System.out.println(String.format("Std Comb Score: %.2f%%",mcGame.getStdCombScore()));
+			System.out.println(String.format("Std Comb Score: %.2f",mcGame.getStdCombScore()));
 		} // if(jsonObj.get("success").getAsBoolean())
 	} // main
 	
