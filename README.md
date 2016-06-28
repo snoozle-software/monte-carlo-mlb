@@ -13,10 +13,10 @@ The code is built using Maven, so you need Maven and java 8 to run. There is a d
 1. Build and run using docker or maven
 2. Run (Maven: run script target/bin/webapp[.bat]
 3. Enter day of year
-`Pick game date (YYYY-MM-DD) OR 0 to exit:
-2016-05-01`
+```Pick game date (YYYY-MM-DD) OR 0 to exit:
+2016-05-01```
 4. Select game you want to simulate or choose to exit
-`Games for 2016-05-01
+```Games for 2016-05-01
 1 Astros at Athletics
 2 Royals at Mariners
 3 Padres at Dodgers
@@ -34,7 +34,7 @@ The code is built using Maven, so you need Maven and java 8 to run. There is a d
 15 Angels at Rangers
 Pick game number (0 to exit): 
 9
-`
+```
 
 ## Related Products
 
