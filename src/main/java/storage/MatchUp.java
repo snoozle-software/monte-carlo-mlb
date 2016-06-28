@@ -2,8 +2,18 @@ package storage;
 
 import java.text.ParseException;
 
+/**
+ * @author Gregory Wagner 
+ * Snoozle Software - www.snoozle.net
+ * 
+ * Class - Matchup
+ * 
+ *  Container for game matchup data
+ *  Date - June 27, 2016
+ */
 public class MatchUp {
 
+	// attributes 
 	private String gameid = "";
 	private String date = null;
 	private String visName = "";
@@ -19,13 +29,14 @@ public class MatchUp {
 	private String visInn = "";
 	private String homeInn = "";
 
+	// ------------------ CONSTRUCTORS ------------------------------
 	public MatchUp(String gameid, String date, int homenum, int visnum) throws ParseException {
 		this.gameid = gameid;
 		this.date = date; 
 		this.homenum = homenum;
 		this.visnum = visnum;
 	}
-
+	
 	public MatchUp(String gameid, String date, int homenum, int visnum, int visRuns, int visHits,
 			int visErr, String visInn, int homeRuns, int homeHits, int homeErr, String homeInn) throws ParseException {
 		this.gameid = gameid;
@@ -66,6 +77,7 @@ public class MatchUp {
 	public MatchUp() {
 	}
 
+	// ------------------- GETTERS AND SETTERS ---------------------------------
 	public String getGameid() {
 		return gameid;
 	}
@@ -186,4 +198,4 @@ public class MatchUp {
 				+ "]";
 	}
 	
-}
+} // class Matchup

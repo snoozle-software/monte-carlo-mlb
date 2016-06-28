@@ -1,7 +1,15 @@
 package storage;
 
 
-// Frame situation: count, outs, on-base
+/**
+ * @author Gregory Wagner 
+ * Snoozle Software - www.snoozle.net
+ * 
+ * Class - Situation
+ * 
+ *  Frame situation: count, outs, on-base
+ *  Date - June 27, 2016
+ */
 public class Situation {
 	
 	// attributes
@@ -13,13 +21,13 @@ public class Situation {
 	private int onThird = 0;
 	private int batting = 0;
 	
-	// Constructors
+	// -------------------Constructors---------------------------
 	public Situation()
 	{
 		super();
 	}
 
-	// getters and setters
+	//------------- getters and setters ------------------------
 	public int getStrikes() {
 		return strikes;
 	}

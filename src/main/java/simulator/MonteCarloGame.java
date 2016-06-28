@@ -9,8 +9,19 @@ import storage.PitchingStats;
 import storage.ScoreBoard;
 import storage.Situation;
 
+
+/**
+ * @author Gregory Wagner
+ * Snoozle Software - www.snoozle.net
+ * 
+ * Class - MonteCarloGame
+ * 
+ * Monte carlo class simulates games and load lineups
+ * Date - June 27, 2016
+ */
 public class MonteCarloGame {
 
+	// Class attributes
 	private long seed = 0;
 	private static ScoreBoard scoreBoard = null;
 	private static Random random = new Random();
@@ -38,12 +49,14 @@ public class MonteCarloGame {
 	private double homeWinsLower = 0.0;
 	private double awayWinsLower;
 
+	// Class Constants 
 	private final static int EMPTYBASE = 0;
 	private final static int numInnings = 9;
 	
 	
 
-	// Constructors 
+	//-----------------Constructors------------------------
+	
 	public MonteCarloGame(ArrayList<BattingStats> awayLineUp, ArrayList<BattingStats> homeLineUp,
 			ArrayList<PitchingStats> awayPitching, ArrayList<PitchingStats> homePitching) {
 		initHist();
@@ -90,7 +103,16 @@ public class MonteCarloGame {
 		getLineUps();
 	}
 	
-	// Simulates one game based on the seed, teams, pitchers and lineups
+	// --------------------METHODS-------------------------------
+	
+	/*
+	 * Method - simulateGame()
+	 * Input: none
+	 * Output: game scoreboard
+	 * 
+	 * // Simulates one game based on the seed, teams, pitchers and lineups
+	 */
+	
 	private ScoreBoard simulateGame() {
 		
 		scoreBoard = new ScoreBoard();
@@ -105,7 +127,8 @@ public class MonteCarloGame {
 		{
 			playFrame();
 			scoreBoard.addFrame();
-			if(scoreBoard.getCurrentFrame() >= numInnings*2 && (scoreBoard.getRunsAway() != scoreBoard.getRunsHome())) // check for ties 
+			// check for ties 
+			if(scoreBoard.getCurrentFrame() >= numInnings*2 && (scoreBoard.getRunsAway() != scoreBoard.getRunsHome())) 
 			{
 				gameCompleted = true;
 			}
@@ -114,20 +137,40 @@ public class MonteCarloGame {
 		return scoreBoard;
 	}
 	
+	/*
+	 * Method - simulateGames()
+	 * Input: none
+	 * Output: none
+	 * 
+	 * Sets default number of games for simulator 
+	 */
 	public void simulateGames()
 	{
 		simulateGames(numberOfGames);
 	}
 	
+	/*
+	 * Method - simulateGames()
+	 * Input: number of games
+	 * Output: none
+	 * 
+	 * Sets default number of games for simulator and add no score bias 
+	 */
 	public void simulateGames(int numberOfGames)
 	{
 		double bias = 0.0;
 		simulateGames(numberOfGames, bias);
 	}
 	
-	// Simulates one game based on the seed, teams, pitchers and lineups
+	/*
+	 * Method - simulateGames(int numberOfGames, double bias) 
+	 * Input: number of games to simulate and score bias
+	 * Simulates one game based on the seed, teams, pitchers and lineups
+	 */
+	
 	public void simulateGames(int numberOfGames, double bias) {
 		
+		// error checking to make sure the lineups have 9 players
 		if((awayLineUp.size() < 9) || (homeLineUp.size() < 9) ||
 		   (awayPitching.size() == 0) || (homePitching.size() == 0))
 		{
@@ -140,9 +183,13 @@ public class MonteCarloGame {
 		homeWins = 0;
 		awayWins = 0;
 		
+		// runs games
 		for(int ii = 0; ii <  numberOfGames; ii++)
 		{
+			// simulate game
 			ScoreBoard scoreBoard = simulateGame();
+			
+			// calculates the combined runs
 			int combRuns = scoreBoard.getRunsAway() 
 					     + scoreBoard.getRunsHome()
 					     + (int)Math.round(bias);
@@ -158,15 +205,21 @@ public class MonteCarloGame {
 			}
 		}
 		
+		// tallies values
 		homeWinProb = (double)homeWins/(double)numberOfGames;
 		awayWinProb = (double)awayWins/(double)numberOfGames;
 		aveCombScore = combScore.getMean();
 		stdCombScore = combScore.getStandardDeviation();
 		medCombScore = combScore.getPercentile(50.0);
 		
-	}
+	} // public void simulateGames(int numberOfGames, double bias) {
 
-	// initialize histogram with 0s from 1 to 50
+	/*
+	 * Method - initHist 
+	 * Input: none
+	 * Output: none
+	 *  Initializes score histogram with 0s from 1 to 50
+	 */
 	private void initHist()
 	{
 		for(int ii = 0; ii < numbOfBins; ii++)
@@ -175,7 +228,14 @@ public class MonteCarloGame {
 		}
 	}
 	
+	/*
+	 * Method - getLineUps()
+	 * Input - none
+	 * Ouptput - none
+	 * Puts default values in for the lineups and pitchers
+	 */
 	private void getLineUps() {
+		// away
 		awayLineUp.add(new BattingStats(1));
 		awayLineUp.add(new BattingStats(2));
 		awayLineUp.add(new BattingStats(3));
@@ -187,7 +247,7 @@ public class MonteCarloGame {
 		awayLineUp.add(new BattingStats(9));
 		awayPitching.add(PitchingStats.getDefault());
 		
-
+		// home
 		homeLineUp.add(new BattingStats(1));
 		homeLineUp.add(new BattingStats(2));
 		homeLineUp.add(new BattingStats(3));
@@ -202,12 +262,21 @@ public class MonteCarloGame {
 	}
 	
 
-	// plays a frame
+	/*
+	 * Method - playFram()
+	 * Input: none
+	 * Ouput: none
+	 * plays a frame, alters scoreboard and awayBatting and homeBatting
+	 */
 	private void playFrame() {
+		
+		// initalizes frame data
 		Situation situation = new Situation();
 		int battingNum;
 		ArrayList<BattingStats> battingOrder;
 		PitchingStats pitchingStats;
+		
+		// toggles batting
 		boolean isAwayBatting = (scoreBoard.getCurrentFrame()%2 == 0);
 		
 		// away batting
@@ -217,6 +286,7 @@ public class MonteCarloGame {
 			battingOrder = awayLineUp;
 			pitchingStats = awayPitching.get(0);
 		}
+		// home batting
 		else
 		{
 			battingNum = homeBatting;
@@ -224,25 +294,30 @@ public class MonteCarloGame {
 			pitchingStats = homePitching.get(0);
 		}
 		
+		// plays frame until three outs
 		while(situation.getOuts() < 3)
 		{
-
+			// check if home team winning in bottom of 9th and beyond
 			if(!isAwayBatting && 
 		       (scoreBoard.getCurrentFrame() > 17) &&
-		       (scoreBoard.getRunsHome() > scoreBoard.getRunsAway())) // check if home team winning in bottom of 9th and beyond
+		       (scoreBoard.getRunsHome() > scoreBoard.getRunsAway())) 
 			{
 				gameCompleted = true;
 				return;
 			}
-			
+	
+			// where all the magic happens
 			situation = atBat(battingOrder.get(battingNum), pitchingStats, situation);
 			
+			// increments batting order number if end of the lineup start over 
 			battingNum++;
 			if(battingNum >= battingOrder.size())
 			{
 				battingNum = 0;
 			}
 		}
+		
+		// saves off batting num for next inning
 		if(isAwayBatting)
 		{
 			awayBatting = battingNum;
@@ -253,18 +328,26 @@ public class MonteCarloGame {
 		}
 		
 		
-	}
+	} // private void playFrame() {
 
-	// plays at bat and relays outcome
+	/*
+	 * Method - atBat
+	 * Input: batting stats of batter, pitching stats, and game situation
+	 *  plays at bat and relays outcome, basically uses random numbers to simulate at bats
+	 */
 	private Situation atBat(BattingStats battingStats, PitchingStats pitchingStats, Situation situation) {
 		
+		// calculates onBaseProb with simple logic
 		Double onBaseProb = getOnBaseProb(battingStats, pitchingStats);
 		double uniformDraw = random.nextDouble();
+		
+		// if draw values is less than uniformDraw value, on base
 		if(uniformDraw < onBaseProb)
 		{
+			// figure out the result of the on base (hit, walk, etc.)
 			situation = onBaseOutcome(battingStats, pitchingStats, situation);
 		}
-		// out
+		// else out
 		else
 		{
 			situation.resetCount();
@@ -274,12 +357,21 @@ public class MonteCarloGame {
 		return situation;
 	}
 
-	// simulates the type of hit 
+	/* 
+	 * Method: onBaseOutcome
+	 * Input: battingStats, pitchingStats, situation
+	 * Output: updated situtation
+	 * 
+	 *  simulates the type of hit, and manipulates the players on base, follows simple base running logic
+	 *  Assumes no base stealing and no errors
+	 *  Uses probability of current stats to predict what time of hit or likelihood of walk, or HBP
+	 *  
+	 */
 	private Situation onBaseOutcome(BattingStats battingStats, PitchingStats pitchingStats, Situation situation) {
 		double currentWeight = 1.0;
 		double defaultWeight = 0.0;
 		
-		// If below threshold get weight
+		// If below threshold get weighted average between default stats and measured stats
 		if(battingStats.getAtBats() < BattingStats.minTPA)
 		{
 			currentWeight = battingStats.getAtBats() / BattingStats.minTPA;
@@ -287,6 +379,8 @@ public class MonteCarloGame {
 									/ BattingStats.minTPA;
 		}
 		
+		// calculates the probability of each instance of on base based 
+		// on current stats
 		double probSingleCurrent = (double)battingStats.getSingles() / 
 				(double)(battingStats.getTpa() * battingStats.getOnBase());
 		double probDoubleCurrent = (double)battingStats.getDoubles() / 
@@ -300,6 +394,7 @@ public class MonteCarloGame {
 		double probHitByPitchCurrent = (double)battingStats.getHitByPitch() / 
 				(double)(battingStats.getTpa() * battingStats.getOnBase());
 		
+		// gets weighted stats with default stats if need be
 		double probSingle = probSingleCurrent * currentWeight 
 				+ BattingStats.probSingleAve * defaultWeight;
 		double probDouble = probDoubleCurrent * currentWeight 
@@ -479,38 +574,45 @@ public class MonteCarloGame {
 		}
 		
 		return situation;
-	}
+	} // private Situation onBaseOutcome(BattingStats battingStats, PitchingStats pitchingStats, Situation situation) {
 
-	// calculates the onbase probability taking in account pitching stats
-		private Double getOnBaseProb(BattingStats battingStats, PitchingStats pitchingStats) {
-			
-			double battingOnBase = battingStats.getOnBase();
-			
-			// if tpa is less the minTpa then get weighed onbase percent
-			if(battingStats.getAtBats() < BattingStats.minTPA)
-			{
-				double currentWeight = battingStats.getAtBats() / BattingStats.minTPA;
-				double defaultWeight = (BattingStats.minTPA - battingStats.getAtBats()) 
-										/ BattingStats.minTPA;
-				battingOnBase = battingStats.getOnBase() * currentWeight 
-						+ BattingStats.onBaseAve * defaultWeight;
-			}
-			
-			double pitchingOnBase = pitchingStats.getOnBase();
-			if(pitchingStats.getInningsPitched() < PitchingStats.minInningsPitched)
-			{
-				double currentWeight = pitchingStats.getInningsPitched() / PitchingStats.minInningsPitched;
-				double defaultWeight = (PitchingStats.minInningsPitched - pitchingStats.getInningsPitched()) 
-										/ PitchingStats.minInningsPitched;
-				pitchingOnBase = pitchingStats.getOnBase() * currentWeight 
-						+ PitchingStats.onBaseAve * defaultWeight;
-			}
-			double pitchingBias = pitchingOnBase - PitchingStats.onBaseAve;
-			
-			return battingOnBase + pitchingBias;
+	/*
+	 * Method - getOnBaseProb
+	 * Input: batting stats, pitching stats
+	 * Output: probablity of getting on base
+	 *  calculates the onbase probability taking in account pitching stats, the effects of the 
+	 *  pitches uses a really basic logic, finds the delta of the pitcher onbase with the league onbase average
+	 *  Then add the delta to the current batters onbase percentage
+	 */
+	private Double getOnBaseProb(BattingStats battingStats, PitchingStats pitchingStats) {
+		
+		double battingOnBase = battingStats.getOnBase();
+		
+		// if tpa is less the minTpa then get weighed onbase percent
+		if(battingStats.getAtBats() < BattingStats.minTPA)
+		{
+			double currentWeight = battingStats.getAtBats() / BattingStats.minTPA;
+			double defaultWeight = (BattingStats.minTPA - battingStats.getAtBats()) 
+									/ BattingStats.minTPA;
+			battingOnBase = battingStats.getOnBase() * currentWeight 
+					+ BattingStats.onBaseAve * defaultWeight;
 		}
+		
+		double pitchingOnBase = pitchingStats.getOnBase();
+		if(pitchingStats.getInningsPitched() < PitchingStats.minInningsPitched)
+		{
+			double currentWeight = pitchingStats.getInningsPitched() / PitchingStats.minInningsPitched;
+			double defaultWeight = (PitchingStats.minInningsPitched - pitchingStats.getInningsPitched()) 
+									/ PitchingStats.minInningsPitched;
+			pitchingOnBase = pitchingStats.getOnBase() * currentWeight 
+					+ PitchingStats.onBaseAve * defaultWeight;
+		}
+		double pitchingBias = pitchingOnBase - PitchingStats.onBaseAve;
+		
+		return battingOnBase + pitchingBias;
+	}
 	
-	// calculates 
+	// ------------------ GETTERS AND SETTERS ------------------------------------------
 	
 	public long getSeed() {
 		return seed;
@@ -607,4 +709,4 @@ public class MonteCarloGame {
 		return probUnder;
 	}
 
-}
+} // class montecarlogame

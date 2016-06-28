@@ -1,7 +1,15 @@
 package storage;
 
 import java.util.Vector;
-
+/**
+ * @author Gregory Wagner 
+ * Snoozle Software - www.snoozle.net
+ * 
+ * Class -  ScoreBoard
+ * 
+ *  Constainer for scoreboard for updating stats
+ *  Date - June 27, 2016
+ */
 public class ScoreBoard {
 	
 	// attributes 
@@ -13,9 +21,8 @@ public class ScoreBoard {
 	private int awayTeam = 0;
 	private int homeTeam = 0;
 	private int currentFrame = -1;
-	/**
-	 * 
-	 */
+	
+	//------ Constructors ---------------------------
 	public ScoreBoard() {
 		super();
 	}
@@ -27,7 +34,7 @@ public class ScoreBoard {
 		this.homeTeam = homeTeamNum;
 	}
 	
-	// accessors
+	// ------------accessors ----------------------
 	public void addFrame()
 	{
 		frames.add(0);
@@ -198,4 +205,4 @@ public class ScoreBoard {
 	
 	
 
-}
+} // class ScoreBoard

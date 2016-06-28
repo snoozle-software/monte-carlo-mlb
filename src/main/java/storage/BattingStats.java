@@ -1,9 +1,20 @@
 package storage;
 
+/**
+ * @author Gregory Wagner 
+ * Snoozle Software - www.snoozle.net
+ * 
+ * Class - Situation
+ * 
+ *  Containter for Battings Stats
+ *  Date - June 27, 2016
+ */
 public class BattingStats {
-	public static final double minTPA = 100.0;
 	
-	// league averages 
+	// Constants 
+	public static final double minTPA = 100.0; // minimum to not have weighted stats
+	
+	// league averages from 2015
 	public  final static double onBaseAve = PitchingStats.onBaseAve;
 	public  final static double hitByPitchAve = 53;
 	public  final static double sacFliesAve = 41;
@@ -43,7 +54,7 @@ public class BattingStats {
 	private double bb = 0;
 	private double tpa = Double.MIN_VALUE;
 	
-	// Constructors
+	// ---------------------Constructors----------------------------
 	public BattingStats(int playerID, double onBase, double hitByPitch, double sacFlies, double atBats, double hits,
 			double doubles, double triples, double hr, double singles, double bb, double tpa) {
 		super();
@@ -70,7 +81,7 @@ public class BattingStats {
 		super();
 	}
 
-	// Getters and setters
+	// -----------------------Getters and setters -----------------------------------------
 	public int getPlayerID() {
 		return playerID;
 	}

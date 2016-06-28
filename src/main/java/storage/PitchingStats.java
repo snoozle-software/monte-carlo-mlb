@@ -1,25 +1,29 @@
 package storage;
 
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+/**
+ * @author Gregory Wagner 
+ * Snoozle Software - www.snoozle.net
+ * 
+ * Class - Situation
+ * 
+ *  Pitching stats container
+ *  Date - June 27, 2016
+ */
 
-// season stats for predictions
 public class PitchingStats {
 	
-	private static final String statString = "http://espn.go.com/mlb/player/stats/_/id/";
-	private static final String statTail = "/type/pitching/";
-	
+	// constants
 	public final static double onBaseAve = .317;
 	public final static double aveNumOfPitchesAve = 90.0;
 	public final static double minInningsPitched = 50.0;
 	
+	// attributes
 	private int playerID = 0;
 	private double onBase = 0.0;
 	private double inningsPitched = 0.0; 
 	private double aveNumOfPitches = 0.0;
 	
-	// Constructors
+	// ============= Constructors -------------------------------------
 	public PitchingStats(int playerID, double onBase, double aveNumOfPitches, double inningsPitched) {
 		super();
 		this.playerID = playerID;
@@ -37,7 +41,7 @@ public class PitchingStats {
 		super();
 	}
 
-	// getters and setters
+	// ---------------- getters and setters -------------------------------
 	public int getPlayerID() {
 		return playerID;
 	}
@@ -80,4 +84,4 @@ public class PitchingStats {
 	}
 
 	
-}
+} // class pitchingStats
