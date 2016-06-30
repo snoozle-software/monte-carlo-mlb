@@ -19,6 +19,7 @@ public class PitchingStats {
 	
 	// attributes
 	private int playerID = 0;
+	private String playerName = "";
 	private double onBase = 0.0;
 	private double inningsPitched = 0.0; 
 	private double aveNumOfPitches = 0.0;
@@ -27,6 +28,15 @@ public class PitchingStats {
 	public PitchingStats(int playerID, double onBase, double aveNumOfPitches, double inningsPitched) {
 		super();
 		this.playerID = playerID;
+		this.onBase = onBase;
+		this.aveNumOfPitches = aveNumOfPitches;
+		this.inningsPitched = inningsPitched;
+	}
+	
+	public PitchingStats(int playerID, String playerName, double onBase, double aveNumOfPitches, double inningsPitched) {
+		super();
+		this.playerID = playerID;
+		this.playerName = playerName;
 		this.onBase = onBase;
 		this.aveNumOfPitches = aveNumOfPitches;
 		this.inningsPitched = inningsPitched;
@@ -44,6 +54,14 @@ public class PitchingStats {
 	// ---------------- getters and setters -------------------------------
 	public int getPlayerID() {
 		return playerID;
+	}
+
+	public String getPlayerName() {
+		return playerName;
+	}
+
+	public void setPlayerName(String playerName) {
+		this.playerName = playerName;
 	}
 
 	public void setPlayerID(int playerID) {
