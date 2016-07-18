@@ -140,8 +140,10 @@ public class Main {
 					
 					// Game simulator
 					MonteCarloGame mcGame = new MonteCarloGame(awayLineup,homeLineup,awayPitching,homePitching);
+					String awayTeamName = awayTeam.replace("\"", "");
+					String homeTeamName = homeTeam.replace("\"", "");
 					String gameTitle = String.format("%s %s at %s", 
-							date.replace("\"", ""), awayTeam.replace("\"", ""), homeTeam.replace("\"", ""));
+							date.replace("\"", ""), awayTeamName, homeTeamName);
 					System.out.println(gameTitle);
 					mcGame.setNumberOfGames(numOfMCGames);
 					mcGame.simulateGames();
@@ -152,6 +154,14 @@ public class Main {
 					System.out.println(String.format("Average Comb Score: %.2f",mcGame.getAveCombScore()));
 					System.out.println(String.format("Median Comb Score: %.2f",mcGame.getMedCombScore()));
 					System.out.println(String.format("Std Comb Score: %.2f",mcGame.getStdCombScore()));
+					
+					System.out.println("\n"+awayTeamName + "'s Starting Pitcher: " + awayPitching.get(0).getPlayerName().replace("\"", ""));
+					System.out.println(awayTeamName + " Hitter's Projected Performance");
+					generateProjectedStats(mcGame.getAwayLineUp(), mcGame);
+					
+					System.out.println("\n"+homeTeamName + "'s Starting Pitcher: " + homePitching.get(0).getPlayerName().replace("\"", ""));
+					System.out.println(homeTeamName + " Hitter's Projected Performance");
+					generateProjectedStats(mcGame.getHomeLineUp(), mcGame);
 				} // if(jsonObj.get("success").getAsBoolean())
 			}// else if(gameNumber > 0)
 		}while(gameNumber != 0); // do
@@ -232,6 +242,36 @@ public class Main {
 		return returnString;
 	} // public static String getJsonAPI(String urlString, String postParameters) throws IOException
 
+	/*
+	 * generateProjectedStats
+	 * Inputs: Batting Stats ArrayLists, MonteCarloGame
+	 * Outputs: none
+	 * 
+	 * Prints out the lineup with projected stats
+	 */
 	
+	private static void generateProjectedStats(ArrayList<BattingStats> lineUp, MonteCarloGame mcGame) {
+		
+		System.out.println(String.format("%-30s\tAB\tR\tH\tRBI\tBB\tAVG\tOBP\tSLG","Player"));
+		
+		for(BattingStats battingStats: lineUp)
+		{
+			int playerID = battingStats.getPlayerID();
+			String playerName = battingStats.getPlayerName();
+			String outputString = String.format("%-30s\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.3f\t%.3f\t%.3f",
+					playerName,
+					mcGame.getHitterAB().get(playerID).getMean(),
+					mcGame.getHitterRuns().get(playerID).getMean(),
+					mcGame.getHitterHits().get(playerID).getMean(),
+					mcGame.getHitterRBI().get(playerID).getMean(),
+					mcGame.getHitterBB().get(playerID).getMean(),
+					mcGame.getHitterAvg().get(playerID).getMean(),
+					mcGame.getHitterOBP().get(playerID).getMean(),
+					mcGame.getHitterSLG().get(playerID).getMean());
+			System.out.println(outputString);
+		}
+		
+		
+	}
 
 } // class main

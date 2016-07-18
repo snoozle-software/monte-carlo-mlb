@@ -1,10 +1,15 @@
 package simulator;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Random;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import storage.BattingStats;
+import storage.HitterBoxScoreStats;
 import storage.PitchingStats;
 import storage.ScoreBoard;
 import storage.Situation;
@@ -34,6 +39,7 @@ public class MonteCarloGame {
 	private ArrayList<PitchingStats> homePitching = new ArrayList<PitchingStats>();
 	int homeBatting = 0;
 	int awayBatting = 0;
+	private Date gameDate;
 	private boolean gameCompleted;
 	private int homeWins = 0;
 	private int awayWins = 0;
@@ -53,7 +59,17 @@ public class MonteCarloGame {
 	private final static int EMPTYBASE = 0;
 	private final static int numInnings = 9;
 	
-	
+	// statistical holders for game boxscore stats
+	HashMap<Integer, DescriptiveStatistics> hitterAB = new HashMap<Integer, DescriptiveStatistics>();
+	HashMap<Integer, DescriptiveStatistics> hitterRuns = new HashMap<Integer, DescriptiveStatistics>();
+	HashMap<Integer, DescriptiveStatistics> hitterHits = new HashMap<Integer, DescriptiveStatistics>();
+	HashMap<Integer, DescriptiveStatistics> hitterRBI = new HashMap<Integer, DescriptiveStatistics>();
+	HashMap<Integer, DescriptiveStatistics> hitterBB = new HashMap<Integer, DescriptiveStatistics>();
+	HashMap<Integer, DescriptiveStatistics> hitterSO = new HashMap<Integer, DescriptiveStatistics>();
+	HashMap<Integer, DescriptiveStatistics> hitterAvg = new HashMap<Integer, DescriptiveStatistics>();
+	HashMap<Integer, DescriptiveStatistics> hitterOBP = new HashMap<Integer, DescriptiveStatistics>();
+	HashMap<Integer, DescriptiveStatistics> hitterSLG = new HashMap<Integer, DescriptiveStatistics>();
+	private HashMap<Integer, HitterBoxScoreStats> hitterBoxScore;
 
 	//-----------------Constructors------------------------
 	
@@ -117,6 +133,8 @@ public class MonteCarloGame {
 		
 		scoreBoard = new ScoreBoard();
 		scoreBoard.addFrame();
+		
+		hitterBoxScore = new HashMap<Integer,HitterBoxScoreStats>();
 		
 		gameCompleted = false;
 
@@ -188,8 +206,8 @@ public class MonteCarloGame {
 		{
 			// simulate game
 			ScoreBoard scoreBoard = simulateGame();
-			
-			// calculates the combined runs
+			calculateHittingAverages();
+			iterateHitterDescriptiveStats();
 			int combRuns = scoreBoard.getRunsAway() 
 					     + scoreBoard.getRunsHome()
 					     + (int)Math.round(bias);
@@ -213,6 +231,119 @@ public class MonteCarloGame {
 		medCombScore = combScore.getPercentile(50.0);
 		
 	} // public void simulateGames(int numberOfGames, double bias) {
+
+	/*
+	 * private void iterateHitterDescriptiveStats()
+	 * Adds values to descriptive stats to hashmaps
+	 * 
+	 * Inputs: none
+	 * Output: none
+	 * Alters:  hitterAB, hitterRuns, hitterHits, hitterRBI, hitterBB, hitterSO, 
+	 *          hitterAvg, hitterOBP,  hitterSLG
+	 * 
+	 */
+	private void iterateHitterDescriptiveStats() 
+	{
+		@SuppressWarnings("rawtypes")
+		Iterator it = hitterBoxScore.entrySet().iterator();
+		while (it.hasNext()) {
+	        @SuppressWarnings("rawtypes")
+			Map.Entry pair = (Map.Entry)it.next();
+	        HitterBoxScoreStats boxScoreStats = (HitterBoxScoreStats) pair.getValue();
+	        DescriptiveStatistics abDS   = hitterAB.get(boxScoreStats.getPlayerID());
+	        DescriptiveStatistics runsDS = hitterRuns.get(boxScoreStats.getPlayerID());
+	        DescriptiveStatistics hitsDS = hitterHits.get(boxScoreStats.getPlayerID());
+	        DescriptiveStatistics rbiDS  = hitterRBI.get(boxScoreStats.getPlayerID());
+	        DescriptiveStatistics bbDS   = hitterBB.get(boxScoreStats.getPlayerID());
+	        DescriptiveStatistics soDS   = hitterSO.get(boxScoreStats.getPlayerID());
+	        DescriptiveStatistics avgDS  = hitterAvg.get(boxScoreStats.getPlayerID());
+	        DescriptiveStatistics obpDS  = hitterOBP.get(boxScoreStats.getPlayerID());
+	        DescriptiveStatistics slgDS  = hitterSLG.get(boxScoreStats.getPlayerID());
+	        if(abDS == null) // assume if one null all are
+	        {
+	        	abDS   = new DescriptiveStatistics();
+	 	        runsDS = new DescriptiveStatistics();
+	 	        hitsDS = new DescriptiveStatistics();
+	 	        rbiDS  = new DescriptiveStatistics();
+	 	        bbDS   = new DescriptiveStatistics();
+	 	        soDS   = new DescriptiveStatistics();
+	 	        avgDS  = new DescriptiveStatistics();
+	 	        obpDS  = new DescriptiveStatistics();
+	 	        slgDS  = new DescriptiveStatistics();
+	        }
+	        
+	        abDS.addValue(boxScoreStats.getAtBats());
+	        runsDS.addValue(boxScoreStats.getRuns());
+	        hitsDS.addValue(boxScoreStats.getHits());
+	        rbiDS.addValue(boxScoreStats.getRbi());
+	        bbDS.addValue(boxScoreStats.getBaseOnBalls());
+	        soDS.addValue(boxScoreStats.getStrikeOuts());
+	        avgDS.addValue(boxScoreStats.getBattingAve());
+	        obpDS.addValue(boxScoreStats.getOnBasePer());
+	        slgDS.addValue(boxScoreStats.getSluggingPer());
+	        
+	        hitterAB.put(boxScoreStats.getPlayerID(), abDS);
+	        hitterRuns.put(boxScoreStats.getPlayerID(), runsDS);
+	        hitterHits.put(boxScoreStats.getPlayerID(), hitsDS);
+	        hitterRBI.put(boxScoreStats.getPlayerID(), rbiDS);
+	        hitterBB.put(boxScoreStats.getPlayerID(), bbDS);
+	        hitterSO.put(boxScoreStats.getPlayerID(), soDS);
+	        hitterAvg.put(boxScoreStats.getPlayerID(), avgDS);
+	        hitterOBP.put(boxScoreStats.getPlayerID(), obpDS);
+	        hitterSLG.put(boxScoreStats.getPlayerID(), slgDS);
+	    }
+		
+	}
+
+	/*
+	 * calculateHittingAverages()
+	 * Set batting average, slugging percent, and onbase percent
+	 * 
+	 * Inputs: none
+	 * Outpus: none
+	 * Modifies: battingAve, sluggingPct, onBasePct
+	 */
+	private void calculateHittingAverages() {
+		@SuppressWarnings("rawtypes")
+		Iterator it = hitterBoxScore.entrySet().iterator();
+	    while (it.hasNext()) {
+	        @SuppressWarnings("rawtypes")
+			Map.Entry pair = (Map.Entry)it.next();
+	        HitterBoxScoreStats boxScoreStats = (HitterBoxScoreStats) pair.getValue();
+	        if(boxScoreStats.getAtBats() != 0)
+	        {
+	        	double battingAve = (double)boxScoreStats.getHits() / (double)boxScoreStats.getAtBats();
+		        boxScoreStats.setBattingAve(battingAve);
+		        double sluggingPct = (double)(boxScoreStats.getSingles() 
+    		            + 2*boxScoreStats.getDoubles() 
+    		            + 3*boxScoreStats.getTriples()
+    		            + 4*boxScoreStats.getHr())
+    		            / (double)boxScoreStats.getAtBats();
+		        boxScoreStats.setSluggingPer(sluggingPct);
+	        }
+	        else
+	        {
+	        	boxScoreStats.setBattingAve(0.0);
+	        	boxScoreStats.setOnBasePer(0.0);
+	        }
+	        
+	        if(boxScoreStats.getTpa() != 0)
+	        {
+	        	double onBasePct = (double)(boxScoreStats.getHits() 
+      		          + boxScoreStats.getBaseOnBalls()
+      		          + boxScoreStats.getHitByPitch())
+      		          / (double)boxScoreStats.getTpa();
+
+		        boxScoreStats.setOnBasePer(onBasePct);
+	        }
+	        else
+	        {
+		        boxScoreStats.setOnBasePer(0.0);
+	        }
+	        hitterBoxScore.put(boxScoreStats.getPlayerID(), boxScoreStats);
+	    }
+		
+	}
 
 	/*
 	 * Method - initHist 
@@ -352,6 +483,18 @@ public class MonteCarloGame {
 		{
 			situation.resetCount();
 			situation.setOuts(situation.getOuts()+1);
+			
+			HitterBoxScoreStats hitterBoxScoreStats = hitterBoxScore.get(battingStats.getPlayerID());
+			if(hitterBoxScoreStats == null)
+			{
+				hitterBoxScoreStats = new HitterBoxScoreStats(battingStats.getPlayerID());
+			}
+			
+			// need to add sacrifice hits and Ks
+
+			hitterBoxScoreStats.setTpa(hitterBoxScoreStats.getTpa()+1);
+			hitterBoxScoreStats.setAtBats(hitterBoxScoreStats.getAtBats()+1);
+			hitterBoxScore.put(battingStats.getPlayerID(),hitterBoxScoreStats);
 		}
 		
 		return situation;
@@ -371,7 +514,15 @@ public class MonteCarloGame {
 		double currentWeight = 1.0;
 		double defaultWeight = 0.0;
 		
-		// If below threshold get weighted average between default stats and measured stats
+		// Initialize box data
+		HitterBoxScoreStats hitterBoxScoreStats = hitterBoxScore.get(battingStats.getPlayerID());
+		if(hitterBoxScoreStats == null)
+		{
+			hitterBoxScoreStats = new HitterBoxScoreStats(battingStats.getPlayerID());
+		}
+		hitterBoxScoreStats.setTpa(hitterBoxScoreStats.getTpa()+1);
+		
+		// If below threshold get weight
 		if(battingStats.getAtBats() < BattingStats.minTPA)
 		{
 			currentWeight = battingStats.getAtBats() / BattingStats.minTPA;
@@ -407,6 +558,7 @@ public class MonteCarloGame {
 				+ BattingStats.probBBAve * defaultWeight;
 		double probHitByPitch = probHitByPitchCurrent * currentWeight 
 				+ BattingStats.probHitByPitchAve * defaultWeight;
+		
 		double uniformDraw = random.nextDouble();
 		
 		// single
@@ -414,6 +566,10 @@ public class MonteCarloGame {
 		{
 			if(situation.getOnThird() !=  EMPTYBASE)
 			{
+				HitterBoxScoreStats boxScoreStats3 = hitterBoxScore.get(situation.getOnThird());
+				boxScoreStats3.setRuns(boxScoreStats3.getRuns()+1);
+				hitterBoxScore.put(situation.getOnThird(), boxScoreStats3);
+				hitterBoxScoreStats.setRbi(hitterBoxScoreStats.getRbi()+1);
 				situation.setOnThird(EMPTYBASE);
 				// run scored
 				scoreBoard.incRun();
@@ -421,6 +577,10 @@ public class MonteCarloGame {
 			
 			if(situation.getOnSecond() !=  EMPTYBASE)
 			{
+				HitterBoxScoreStats boxScoreStats2 = hitterBoxScore.get(situation.getOnSecond());
+				boxScoreStats2.setRuns(boxScoreStats2.getRuns()+1);
+				hitterBoxScore.put(situation.getOnSecond(), boxScoreStats2);
+				hitterBoxScoreStats.setRbi(hitterBoxScoreStats.getRbi()+1);
 				situation.setOnSecond(EMPTYBASE);
 				// run scored
 				scoreBoard.incRun();
@@ -434,13 +594,19 @@ public class MonteCarloGame {
 			
 			scoreBoard.incHits();
 			situation.setOnFirst(battingStats.getPlayerID());
-			
+			hitterBoxScoreStats.setSingles(hitterBoxScoreStats.getSingles()+1.0);
+			hitterBoxScoreStats.setHits(hitterBoxScoreStats.getHits()+1);
+			hitterBoxScoreStats.setAtBats(hitterBoxScoreStats.getAtBats()+1);
 		}
 		// double
 		else if((uniformDraw >= probSingle)&&(uniformDraw < (probSingle + probDouble)))
 		{
 			if(situation.getOnThird() !=  EMPTYBASE)
 			{
+				HitterBoxScoreStats boxScoreStats3 = hitterBoxScore.get(situation.getOnThird());
+				boxScoreStats3.setRuns(boxScoreStats3.getRuns()+1);
+				hitterBoxScore.put(situation.getOnThird(), boxScoreStats3);
+				hitterBoxScoreStats.setRbi(hitterBoxScoreStats.getRbi()+1);
 				situation.setOnThird(EMPTYBASE);
 				// run scored
 				scoreBoard.incRun();
@@ -448,6 +614,10 @@ public class MonteCarloGame {
 			
 			if(situation.getOnSecond() !=  EMPTYBASE)
 			{
+				HitterBoxScoreStats boxScoreStats2 = hitterBoxScore.get(situation.getOnSecond());
+				boxScoreStats2.setRuns(boxScoreStats2.getRuns()+1);
+				hitterBoxScore.put(situation.getOnSecond(), boxScoreStats2);
+				hitterBoxScoreStats.setRbi(hitterBoxScoreStats.getRbi()+1);
 				situation.setOnSecond(EMPTYBASE);
 				// run scored
 				scoreBoard.incRun();
@@ -461,7 +631,9 @@ public class MonteCarloGame {
 			
 			scoreBoard.incHits();
 			situation.setOnSecond(battingStats.getPlayerID());
-			
+			hitterBoxScoreStats.setDoubles(hitterBoxScoreStats.getDoubles()+1.0);
+			hitterBoxScoreStats.setHits(hitterBoxScoreStats.getHits()+1);
+			hitterBoxScoreStats.setAtBats(hitterBoxScoreStats.getAtBats()+1);
 		}
 		// triple 
 		else if((uniformDraw >= (probSingle + probDouble))
@@ -469,6 +641,10 @@ public class MonteCarloGame {
 		{
 			if(situation.getOnThird() !=  EMPTYBASE)
 			{
+				HitterBoxScoreStats boxScoreStats3 = hitterBoxScore.get(situation.getOnThird());
+				boxScoreStats3.setRuns(boxScoreStats3.getRuns()+1);
+				hitterBoxScore.put(situation.getOnThird(), boxScoreStats3);
+				hitterBoxScoreStats.setRbi(hitterBoxScoreStats.getRbi()+1);
 				situation.setOnThird(EMPTYBASE);
 				// run scored
 				scoreBoard.incRun();
@@ -476,6 +652,10 @@ public class MonteCarloGame {
 			
 			if(situation.getOnSecond() !=  EMPTYBASE)
 			{
+				HitterBoxScoreStats boxScoreStats2 = hitterBoxScore.get(situation.getOnSecond());
+				boxScoreStats2.setRuns(boxScoreStats2.getRuns()+1);
+				hitterBoxScore.put(situation.getOnSecond(), boxScoreStats2);
+				hitterBoxScoreStats.setRbi(hitterBoxScoreStats.getRbi()+1);
 				situation.setOnSecond(EMPTYBASE);
 				// run scored
 				scoreBoard.incRun();
@@ -483,6 +663,10 @@ public class MonteCarloGame {
 			
 			if(situation.getOnFirst() != EMPTYBASE)
 			{
+				HitterBoxScoreStats boxScoreStats1 = hitterBoxScore.get(situation.getOnFirst());
+				boxScoreStats1.setRuns(boxScoreStats1.getRuns()+1);
+				hitterBoxScore.put(situation.getOnFirst(), boxScoreStats1);
+				hitterBoxScoreStats.setRbi(hitterBoxScoreStats.getRbi()+1);
 				situation.setOnFirst(EMPTYBASE);
 				// run scored
 				scoreBoard.incRun();
@@ -490,6 +674,9 @@ public class MonteCarloGame {
 			
 			scoreBoard.incHits();
 			situation.setOnThird(battingStats.getPlayerID());
+			hitterBoxScoreStats.setTriples(hitterBoxScoreStats.getTriples()+1.0);
+			hitterBoxScoreStats.setHits(hitterBoxScoreStats.getHits()+1);
+			hitterBoxScoreStats.setAtBats(hitterBoxScoreStats.getAtBats()+1);
 		}
 		// hr 
 		else if((uniformDraw >= (probSingle + probDouble + probTriple))
@@ -497,6 +684,10 @@ public class MonteCarloGame {
 		{
 			if(situation.getOnThird() !=  EMPTYBASE)
 			{
+				HitterBoxScoreStats boxScoreStats3 = hitterBoxScore.get(situation.getOnThird());
+				boxScoreStats3.setRuns(boxScoreStats3.getRuns()+1);
+				hitterBoxScore.put(situation.getOnThird(), boxScoreStats3);
+				hitterBoxScoreStats.setRbi(hitterBoxScoreStats.getRbi()+1);
 				situation.setOnThird(EMPTYBASE);
 				// run scored
 				scoreBoard.incRun();
@@ -504,6 +695,10 @@ public class MonteCarloGame {
 			
 			if(situation.getOnSecond() !=  EMPTYBASE)
 			{
+				HitterBoxScoreStats boxScoreStats2 = hitterBoxScore.get(situation.getOnSecond());
+				boxScoreStats2.setRuns(boxScoreStats2.getRuns()+1);
+				hitterBoxScore.put(situation.getOnSecond(), boxScoreStats2);
+				hitterBoxScoreStats.setRbi(hitterBoxScoreStats.getRbi()+1);
 				situation.setOnSecond(EMPTYBASE);
 				// run scored
 				scoreBoard.incRun();
@@ -511,6 +706,10 @@ public class MonteCarloGame {
 			
 			if(situation.getOnFirst() != EMPTYBASE)
 			{
+				HitterBoxScoreStats boxScoreStats1 = hitterBoxScore.get(situation.getOnFirst());
+				boxScoreStats1.setRuns(boxScoreStats1.getRuns()+1);
+				hitterBoxScore.put(situation.getOnFirst(), boxScoreStats1);
+				hitterBoxScoreStats.setRbi(hitterBoxScoreStats.getRbi()+1);
 				situation.setOnFirst(EMPTYBASE);
 				// run scored
 				scoreBoard.incRun();
@@ -518,6 +717,11 @@ public class MonteCarloGame {
 			
 			// run scored
 			scoreBoard.incRun();
+			hitterBoxScoreStats.setHr(hitterBoxScoreStats.getHr()+1.0);
+			hitterBoxScoreStats.setHits(hitterBoxScoreStats.getHits()+1);
+			hitterBoxScoreStats.setAtBats(hitterBoxScoreStats.getAtBats()+1);
+			hitterBoxScoreStats.setRbi(hitterBoxScoreStats.getRbi()+1);
+			hitterBoxScoreStats.setRuns(hitterBoxScoreStats.getRuns()+1);
 		}
 		// walk
 		else if((uniformDraw >= (probSingle + probDouble + probTriple + probHR))
@@ -542,8 +746,10 @@ public class MonteCarloGame {
 				situation.setOnSecond(situation.getOnFirst());
 				situation.setOnFirst(EMPTYBASE);
 			}
-			
+
 			situation.setOnFirst(battingStats.getPlayerID());
+			hitterBoxScoreStats.setBaseOnBalls(hitterBoxScoreStats.getBaseOnBalls()+1);
+			
 		}
 		// hitByPitch
 		else if((uniformDraw >= (probSingle + probDouble + probTriple + probHR + probWalk))
@@ -569,10 +775,10 @@ public class MonteCarloGame {
 				situation.setOnSecond(situation.getOnFirst());
 				situation.setOnFirst(EMPTYBASE);
 			}
-			
 			situation.setOnFirst(battingStats.getPlayerID());
+			hitterBoxScoreStats.setHitByPitch(hitterBoxScoreStats.getHitByPitch()+1);
 		}
-		
+		hitterBoxScore.put(battingStats.getPlayerID(),hitterBoxScoreStats);
 		return situation;
 	} // private Situation onBaseOutcome(BattingStats battingStats, PitchingStats pitchingStats, Situation situation) {
 
@@ -638,6 +844,14 @@ public class MonteCarloGame {
 		return awayWins;
 	}
 
+	public Date getGameDate() {
+		return gameDate;
+	}
+
+	public void setGameDate(Date gameDate) {
+		this.gameDate = gameDate;
+	}
+
 	public double getHomeWinProb() {
 		return homeWinProb;
 	}
@@ -679,7 +893,7 @@ public class MonteCarloGame {
 	public double getProbOver(double ou) {
 		double probOver = 0.0;
 		
-		int counter = (int)(ou+0.5);
+		int counter = (int)(ou+1.0);
 		int totalOver = 0;
 		
 		while(counter < numbOfBins)
@@ -709,4 +923,110 @@ public class MonteCarloGame {
 		return probUnder;
 	}
 
-} // class montecarlogame
+	public ArrayList<BattingStats> getAwayLineUp() {
+		return awayLineUp;
+	}
+
+	public void setAwayLineUp(ArrayList<BattingStats> awayLineUp) {
+		this.awayLineUp = awayLineUp;
+	}
+
+	public ArrayList<BattingStats> getHomeLineUp() {
+		return homeLineUp;
+	}
+
+	public void setHomeLineUp(ArrayList<BattingStats> homeLineUp) {
+		this.homeLineUp = homeLineUp;
+	}
+
+	public ArrayList<PitchingStats> getAwayPitching() {
+		return awayPitching;
+	}
+
+	public void setAwayPitching(ArrayList<PitchingStats> awayPitching) {
+		this.awayPitching = awayPitching;
+	}
+
+	public ArrayList<PitchingStats> getHomePitching() {
+		return homePitching;
+	}
+
+	public void setHomePitching(ArrayList<PitchingStats> homePitching) {
+		this.homePitching = homePitching;
+	}
+
+	public HashMap<Integer, DescriptiveStatistics> getHitterAB() {
+		return hitterAB;
+	}
+
+	public void setHitterAB(HashMap<Integer, DescriptiveStatistics> hitterAB) {
+		this.hitterAB = hitterAB;
+	}
+
+	public HashMap<Integer, DescriptiveStatistics> getHitterRuns() {
+		return hitterRuns;
+	}
+
+	public void setHitterRuns(HashMap<Integer, DescriptiveStatistics> hitterRuns) {
+		this.hitterRuns = hitterRuns;
+	}
+
+	public HashMap<Integer, DescriptiveStatistics> getHitterHits() {
+		return hitterHits;
+	}
+
+	public void setHitterHits(HashMap<Integer, DescriptiveStatistics> hitterHits) {
+		this.hitterHits = hitterHits;
+	}
+
+	public HashMap<Integer, DescriptiveStatistics> getHitterRBI() {
+		return hitterRBI;
+	}
+
+	public void setHitterRBI(HashMap<Integer, DescriptiveStatistics> hitterRBI) {
+		this.hitterRBI = hitterRBI;
+	}
+
+	public HashMap<Integer, DescriptiveStatistics> getHitterBB() {
+		return hitterBB;
+	}
+
+	public void setHitterBB(HashMap<Integer, DescriptiveStatistics> hitterBB) {
+		this.hitterBB = hitterBB;
+	}
+
+	public HashMap<Integer, DescriptiveStatistics> getHitterSO() {
+		return hitterSO;
+	}
+
+	public void setHitterSO(HashMap<Integer, DescriptiveStatistics> hitterSO) {
+		this.hitterSO = hitterSO;
+	}
+
+	public HashMap<Integer, DescriptiveStatistics> getHitterAvg() {
+		return hitterAvg;
+	}
+
+	public void setHitterAvg(HashMap<Integer, DescriptiveStatistics> hitterAvg) {
+		this.hitterAvg = hitterAvg;
+	}
+
+	public HashMap<Integer, DescriptiveStatistics> getHitterOBP() {
+		return hitterOBP;
+	}
+
+	public void setHitterOBP(HashMap<Integer, DescriptiveStatistics> hitterOBP) {
+		this.hitterOBP = hitterOBP;
+	}
+
+	public HashMap<Integer, DescriptiveStatistics> getHitterSLG() {
+		return hitterSLG;
+	}
+
+	public void setHitterSLG(HashMap<Integer, DescriptiveStatistics> hitterSLG) {
+		this.hitterSLG = hitterSLG;
+	}
+	
+	
+
+}
