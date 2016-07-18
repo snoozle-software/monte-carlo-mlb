@@ -23,30 +23,39 @@ Pick game date (YYYY-MM-DD) OR 0 to exit:
 ```
 4. Select game you want to simulate or choose to exit
 ```
-Games for 2016-05-01
-1 Astros at Athletics
-2 Royals at Mariners
-3 Padres at Dodgers
-4 Rockies at Diamondbacks
-5 Yankees at Red Sox
-6 Giants at Mets
-7 Blue Jays at Rays
-8 White Sox at Orioles
-9 Reds at Pirates
-10 Marlins at Brewers
-11 Tigers at Twins
-12 Nationals at Cardinals
-13 Braves at Cubs
-14 Indians at Phillies
-15 Angels at Rangers
-Pick game number (0 to exit): 
-9
 2016-05-01 Reds at Pirates
-Prob Away Team Wins: 38.20%
-Prob Home Team Wins: 61.80%
-Average Comb Score: 9.55
+Prob Away Team Wins: 42.90%
+Prob Home Team Wins: 57.10%
+Average Comb Score: 9.09
 Median Comb Score: 9.00
-Std Comb Score: 4.42
+Std Comb Score: 4.29
+
+Reds's Starting Pitcher: Tim Adleman
+Reds Hitter's Projected Performance
+Player                        	AB	R	H	RBI	BB	AVG	OBP	SLG
+Zack Cozart                   	4.66	0.67	1.33	0.46	0.29	0.281	0.327	0.498
+Billy Hamilton                	4.50	0.46	1.03	0.28	0.30	0.223	0.271	0.337
+Joey Votto                    	3.90	0.60	1.10	0.50	0.77	0.275	0.402	0.471
+Brandon Phillips              	4.37	0.46	1.17	0.44	0.18	0.260	0.303	0.367
+Jay Bruce                     	4.21	0.60	1.18	0.75	0.32	0.277	0.330	0.563
+Eugenio Suarez                	4.07	0.42	0.91	0.56	0.32	0.217	0.283	0.375
+Adam Duvall                   	4.10	0.51	1.04	0.66	0.22	0.250	0.291	0.537
+Tucker Barnhart               	3.87	0.28	1.05	0.34	0.32	0.263	0.324	0.372
+Tim Adleman                   	2.82	0.00	0.00	0.00	0.00	0.000	0.000	0.000
+
+Pirates's Starting Pitcher: Jeff Locke
+Pirates Hitter's Projected Performance
+Player                        	AB	R	H	RBI	BB	AVG	OBP	SLG
+John Jaso                     	4.55	0.63	1.28	0.39	0.49	0.276	0.353	0.383
+Andrew McCutchen              	4.52	0.63	1.19	0.56	0.44	0.259	0.327	0.434
+Josh Harrison                 	4.59	0.51	1.29	0.45	0.20	0.276	0.314	0.379
+Starling Marte                	4.41	0.56	1.42	0.62	0.18	0.314	0.362	0.459
+Gregory Polanco               	4.14	0.62	1.25	0.69	0.50	0.296	0.371	0.512
+Sean Rodriguez                	4.00	0.59	1.07	0.77	0.46	0.255	0.341	0.507
+Jordy Mercer                  	3.87	0.42	1.07	0.47	0.49	0.271	0.354	0.377
+Chris Stewart                 	3.74	0.35	0.82	0.35	0.47	0.212	0.317	0.298
+Jeff Locke                    	3.84	0.37	0.84	0.39	0.29	0.211	0.264	0.296
+
 ```
 
 ## Performance
