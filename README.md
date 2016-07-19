@@ -62,6 +62,12 @@ Jeff Locke                    	3.84	0.37	0.84	0.39	0.29	0.211	0.264	0.296
 
 Based on the latest bug fixes and algorithm improves using 2015 pitcher and player stats, using my [optimal betting formula](http://sports.snoozle.net/articles/story/optimized-betting-for-multiple-games-at-the-same-time), the probabilities would beat the house for both the money line and over/under bets. In development is a good performance metric for hitter stats. 
 
+## Player Statistics Update and API
+
+Everyday at 0800 PST, the database release the statistics for the day's before cumulative season statistics for the players and uses the projected lines. Confirmed linesups are set as they become available.
+
+Currently, there is not API key as the system matures an API key will be added.   
+
 ## To Do
 
 For hitters, add strike out predictions and position for players. 
