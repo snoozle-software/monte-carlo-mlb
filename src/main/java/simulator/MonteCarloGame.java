@@ -415,14 +415,14 @@ public class MonteCarloGame {
 		{
 			battingNum = awayBatting;
 			battingOrder = awayLineUp;
-			pitchingStats = awayPitching.get(0);
+			pitchingStats = homePitching.get(0);
 		}
 		// home batting
 		else
 		{
 			battingNum = homeBatting;
 			battingOrder = homeLineUp;
-			pitchingStats = homePitching.get(0);
+			pitchingStats = awayPitching.get(0);
 		}
 		
 		// plays frame until three outs

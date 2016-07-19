@@ -4,7 +4,7 @@ The Monte Carlo MLB Simulator from [Snoozle Software](http://www.snoozle.net) is
 
 ## Overview
 
-This open source project uses the same MC simulation for game prediction that the [Snooze Sports MLB Game Predictor](http://sports.snoozle.net/mlb/predictions.jsp) uses. Based the inputs, the process connects to the Snooze Sports API server via GET messages, and receives JSON messages with data and statistics to run the simulations locally. 
+This open source project uses the same MC simulation for game prediction that the [Snoozle Sports MLB Game Predictor](http://sports.snoozle.net/mlb/predictions.jsp) uses. Based the inputs, the process connects to the Snoozle Sports API server via GET messages, and receives JSON messages with data and statistics to run the simulations locally. 
 
 The baseball game simulator uses the player statistics sent from the API. The simulator is a simplified version of a baseball game where it does not model errors, stolen bases, pitcher pick offs, balks, etc. These events are relatively rare and due to the multiple iterations of the MC simulator, these events become noise in the overall performance.
 
@@ -60,7 +60,13 @@ Jeff Locke                    	3.84	0.37	0.84	0.39	0.29	0.211	0.264	0.296
 
 ## Performance
 
-The combined score compared with over/under predictions from bookmakers from 2015, the combined score predictor is better than chance, the probability for picking the winners still needs work.
+Based on the latest bug fixes and algorithm improves using 2015 pitcher and player stats, using my [optimal betting formula](http://sports.snoozle.net/articles/story/optimized-betting-for-multiple-games-at-the-same-time), the probabilities would beat the house for both the money line and over/under bets. In development is a good performance metric for hitter stats. 
+
+## To Do
+
+For hitters, add strike out predictions and position for players. 
+
+For pitchers, need to calculate predicted statistics. Currently, it is assumed starter pitches entire game, need to have middle reliever and closer statistics. 
 
 ## Related Products
 
