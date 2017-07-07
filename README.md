@@ -64,7 +64,7 @@ Based on the latest bug fixes and algorithm improves using 2015 pitcher and play
 
 ## Player Statistics Update and API
 
-Everyday at 0800 PST, the database release the statistics for the day's before cumulative season statistics for the players and uses the projected lines. Confirmed linesups are set as they become available.
+Everyday at 0500 PST, the database release the statistics for the day's before cumulative season statistics for the players and uses the projected lines. Confirmed linesups are set as they become available.
 
 Currently, there is not API key as the system matures an API key will be added.   
 
